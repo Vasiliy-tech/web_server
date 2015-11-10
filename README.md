@@ -1,2 +1,2 @@
 # web_server
-Web on HighLoad course
+Web-server on HighLoad course
