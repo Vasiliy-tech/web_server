@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 import os, sys, time
 from socket import *
-myHost = ''
+from ClientHandler import Handler
+myHost = '127.0.0.1'
 myPort = 50007
 
 sockobj = socket(AF_INET, SOCK_STREAM)
+sockobj.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 sockobj.bind((myHost, myPort))
-sockobj.listen(5)
+sockobj.listen(4096)
 
 
 def now():
@@ -23,19 +25,6 @@ def reapChildren():
         activeChildren.remove(pid)
 
 
-def handleClient(connection):
-    time.sleep(1)
-    while True:
-
-        data = connection.recv(40960)
-        print(data.decode())
-        if not data: break
-        reply = 'Echo => %s at %s' %(data, now())
-        connection.send(reply.encode())
-        connection.close()
-        os._exit(0)
-
-
 def dispatcher():
     while True:
         connection, addres = sockobj.accept()
@@ -45,7 +34,8 @@ def dispatcher():
         reapChildren()
         childPid = os.fork()
         if childPid == 0:
-            handleClient(connection)
+            client_handler = Handler(connection)
+            client_handler.handleClient()
         else:
             activeChildren.append(childPid)
 
