@@ -6,3 +6,9 @@ class Mu:
 
 a = Mu(3, 'sdf')
 print(a)
+
+data = '1'
+if not data:
+    print('yes')
+else:
+    print('no')

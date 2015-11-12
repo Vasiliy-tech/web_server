@@ -5,6 +5,7 @@ from ClientHandler import Handler
 myHost = '127.0.0.1'
 myPort = 50007
 
+
 sockobj = socket(AF_INET, SOCK_STREAM)
 sockobj.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 sockobj.bind((myHost, myPort))
@@ -30,10 +31,12 @@ def dispatcher():
         connection, addres = sockobj.accept()
         print('Server connected by', addres, ' ')
         print('at', now())
-        #connection.send(b'yes!')
+
         reapChildren()
         childPid = os.fork()
+
         if childPid == 0:
+            #connection.settimeout(1)
             client_handler = Handler(connection)
             client_handler.handle_client()
         else:
