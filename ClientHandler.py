@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import time, os
+import time, os, urllib
 from datetime import datetime
 EOL = '\r\n'
 EOL1 = '\n\n'
@@ -126,6 +126,7 @@ class Handler:
 
 
         self.document_root += first_line[1]
+        self.document_root = urllib.unquote(self.document_root)
 
         if '?' in self.document_root:
             self.document_root = self.document_root.split('?')[0]
