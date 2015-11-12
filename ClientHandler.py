@@ -2,7 +2,7 @@
 import time, os
 from datetime import datetime
 EOL = '\r\n'
-EOL1 = '\n'
+EOL1 = '\n\n'
 EOL2 = '\n\r\n'
 STATUS_OK = '200 OK'
 STATUS_FORBIDDEN = '403 Forbidden'
@@ -29,7 +29,6 @@ class Handler:
 
 
     def handle_client(self):
-        time.sleep(1)
         data = ''
         while True:
             while EOL1 not in data and EOL2 not in data:
@@ -58,7 +57,12 @@ class Handler:
         response += self.server + EOL
         response += self.content_type + self.get_content_type() +EOL
         response += self.date + EOL
-        response += self.content_lenght + EOL
+
+        if self.status == STATUS_NOT_FOUND or self.status == STATUS_FORBIDDEN:
+            response += self.content_lenght + '0' + EOL
+        else:
+            response += self.content_lenght + EOL
+
         response += self.connection_type + EOL + EOL
         if self.method == 'GET':
             response += self.content
@@ -66,6 +70,27 @@ class Handler:
         return response
 
     def get_content_type(self):
+        if self.document_root.lower().endswith('/'):
+            self.content_type += 'text/html'
+
+        elif self.document_root.lower().endswith('.css'):
+            self.content_type += 'text/css'
+
+        elif self.document_root.lower().endswith('.js'):
+            self.content_type += 'application/javascript'
+
+        elif self.document_root.lower().endswith('.png'):
+            self.content_type += 'image/png'
+
+        elif self.document_root.lower().endswith('.gif'):
+            self.content_type += 'image/gif'
+
+        elif self.document_root.lower().endswith('.swf'):
+            self.content_type += 'application/flash'
+
+        else:
+            self.content_type += 'text/plane'
+
         return 'text/html'
 
     def create_response(self, request_data):
@@ -87,7 +112,6 @@ class Handler:
             response_data = request_file.read()
             self.content = response_data
             self.content_lenght += str(len(response_data))
-
         except:
             self.status = STATUS_NOT_FOUND
 
