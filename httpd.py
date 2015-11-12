@@ -35,7 +35,7 @@ def dispatcher():
         childPid = os.fork()
         if childPid == 0:
             client_handler = Handler(connection)
-            client_handler.handleClient()
+            client_handler.handle_client()
         else:
             activeChildren.append(childPid)
 
