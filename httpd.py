@@ -28,7 +28,7 @@ def reapChildren():
 def dispatcher():
     while True:
         connection, addres = sockobj.accept()
-        print('Server connected by', addres, end=' ')
+        print('Server connected by', addres, ' ')
         print('at', now())
         #connection.send(b'yes!')
         reapChildren()
