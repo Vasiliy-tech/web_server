@@ -45,10 +45,6 @@ class Handler:
             print(response_data)
 
             if response_data:
-                #bytes_sent_total = 0
-                #while bytes_sent_total < len(response_data):
-                #    data_to_send = response_data[bytes_sent_total:]
-                #    bytes_sent_total += self.connection.send(data_to_send)
                 self.connection.send(response_data)
                 self.connection.close()
                 if self.method == 'HEAD':
@@ -64,10 +60,10 @@ class Handler:
     def create_response_string(self):
         response = 'HTTP/1.1' + ' ' + self.status + EOL
         response += self.server + EOL
-        response += self.get_content_type() +EOL
+        response += self.get_content_type() + EOL
         response += self.date + EOL
 
-        if self.status == STATUS_NOT_FOUND or self.status == STATUS_FORBIDDEN:
+        if self.status == STATUS_NOT_FOUND or self.status == STATUS_FORBIDDEN or self.status == STATUS_METHOD_NOT_ALLOWED:
             response += self.content_lenght + '0' + EOL
         else:
             response += self.content_lenght + EOL
@@ -78,8 +74,8 @@ class Handler:
             response += EOL + EOL
             response += self.content
             response += EOL
-        elif self.method == 'HEAD':
-           response += self.connection_type + "\n\n"
+        elif self.method == 'HEAD' or self.status == STATUS_METHOD_NOT_ALLOWED:
+           response += self.connection_type + EOL + EOL
 
         return response
 
@@ -121,8 +117,6 @@ class Handler:
         first_line = request_data[0].split()
         self.method = first_line[0]
 
-        if self.method != 'HEAD' and self.method != 'GET':
-            self.status = STATUS_METHOD_NOT_ALLOWED
 
 
         self.document_root += first_line[1]
@@ -143,6 +137,8 @@ class Handler:
 
         if '..' in first_line[1]:
             self.status = STATUS_FORBIDDEN
+        elif self.method != 'HEAD' and self.method != 'GET':
+            self.status = STATUS_METHOD_NOT_ALLOWED
         else:
             try:
                 request_file = open(self.document_root, 'r')

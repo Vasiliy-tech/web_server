@@ -3,7 +3,7 @@ import os, sys, time
 from socket import *
 from ClientHandler import Handler
 myHost = '127.0.0.1'
-myPort = 50007
+myPort = 8080
 
 
 sockobj = socket(AF_INET, SOCK_STREAM)
