@@ -5,8 +5,8 @@ EOL = '\r\n'
 EOL1 = '\n\n'
 EOL2 = '\n\r\n'
 STATUS_OK = '200 OK'
-STATUS_FORBIDDEN = '403 Forbidden'
-STATUS_NOT_FOUND = '404 Not Found'
+STATUS_FORBIDDEN = '404 Forbidden'
+STATUS_NOT_FOUND = '403 Not Found'
 STATUS_METHOD_NOT_ALLOWED = '405 Method Not Allowed'
 
 
@@ -151,7 +151,10 @@ class Handler:
                 if self.method == 'GET':
                     self.content = response_data
             except:
-                self.status = STATUS_NOT_FOUND
+                if self.document_root.endswith('index.html'):
+                    self.status = STATUS_NOT_FOUND
+                else: self.status = STATUS_FORBIDDEN
+
 
         response_data = self.create_response_string()
 
