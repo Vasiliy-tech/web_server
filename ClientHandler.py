@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import time, os, urllib
+import  socket
 from datetime import datetime
 EOL = '\r\n'
 EOL1 = '\n\n'
@@ -11,7 +12,7 @@ STATUS_METHOD_NOT_ALLOWED = '405 Method Not Allowed'
 
 
 class Handler:
-    def __init__(self, connection, document_root=os.getcwd()):
+    def __init__(self, connection, document_root):
         self.connection = connection
         self.server = 'Server: smokey'
         self.document_root = document_root
@@ -33,7 +34,6 @@ class Handler:
         while True:
             while EOL1 not in data and EOL2 not in data:
                 data_buffer = self.connection.recv(1024)
-                #print(data_buffer.decode())
                 if not data_buffer:
                     break
                 data += data_buffer.decode('utf-8')
@@ -46,14 +46,12 @@ class Handler:
 
             if response_data:
                 self.connection.send(response_data)
-                self.connection.close()
-                if self.method == 'HEAD':
-                    pass
-
-
-            else:
-                self.connection.send(response_data)
-                self.connection.close()
+                try:
+                    self.connection.shutdown(socket.SHUT_RDWR)
+                except socket.error:
+                    self.connection.close()
+                else:
+                    self.connection.close()
 
             os._exit(0)
 
@@ -131,8 +129,6 @@ class Handler:
         if self.document_root.endswith('/'):
             self.document_root += 'index.html'
         print(self.document_root)
-
-
 
 
         if '..' in first_line[1]:
