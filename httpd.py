@@ -57,15 +57,19 @@ def dispatcher(document_root):
 cores = 1
 document_root = os.getcwd()
 
-print('Default root (your project directory): ' + document_root + ' and port: ' + str(myPort))
-options, remainder = getopt.getopt(sys.argv[1:], "r:c:")
+try:
+    options, remainder = getopt.getopt(sys.argv[1:], "r:c:")
+except getopt.GetoptError:
+    print('Incorrect options!')
+else:
+    for opt, arg in options:
+        if opt == '-r':
+            document_root = arg
+        elif opt == '-c':
+            cores = int(arg)
 
-for opt, arg in options:
-    if opt == '-r':
-        document_root = arg
-    elif opt == '-c':
-        cores = int(arg)
-
+print('Root (Default it is your project directory): ' + document_root)
+print('Host: localhost:' + str(myPort))
 document_root = is_it_correct_root(document_root)
 if document_root:
     dispatcher(document_root)
