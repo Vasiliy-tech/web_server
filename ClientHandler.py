@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import time, os, urllib
-import  socket
+import socket
 from datetime import datetime
 EOL = '\r\n'
 EOL1 = '\n\n'
@@ -25,6 +25,7 @@ class Handler:
         self.content = ''
         self.connection_type = 'Connection: close'
 
+
     def now(self):
         return time.ctime(time.time())
 
@@ -39,10 +40,10 @@ class Handler:
                 data += data_buffer.decode('utf-8')
 
             self.request_data = data
-            print(data)
+            #print(data)
 
             response_data = self.create_response(self.request_data)
-            print(response_data)
+            #print(response_data)
 
             if response_data:
                 self.connection.send(response_data)
@@ -55,6 +56,7 @@ class Handler:
 
             os._exit(0)
 
+
     def create_response_string(self):
         response = 'HTTP/1.1' + ' ' + self.status + EOL
         response += self.server + EOL
@@ -65,7 +67,6 @@ class Handler:
             response += self.content_lenght + '0' + EOL
         else:
             response += self.content_lenght + EOL
-
 
         if self.method == 'GET':
             response += self.connection_type
@@ -115,8 +116,6 @@ class Handler:
         first_line = request_data[0].split()
         self.method = first_line[0]
 
-
-
         self.document_root += first_line[1]
         self.document_root = urllib.unquote(self.document_root)
 
@@ -124,11 +123,8 @@ class Handler:
             self.document_root = self.document_root.split('?')[0]
 
 
-        print (self.document_root)
-
         if self.document_root.endswith('/'):
             self.document_root += 'index.html'
-        print(self.document_root)
 
 
         if '..' in first_line[1]:
@@ -146,7 +142,6 @@ class Handler:
                 if self.document_root.endswith('index.html'):
                     self.status = STATUS_NOT_FOUND
                 else: self.status = STATUS_FORBIDDEN
-
 
         response_data = self.create_response_string()
 

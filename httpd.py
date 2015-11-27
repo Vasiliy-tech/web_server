@@ -6,7 +6,6 @@ from ClientHandler import Handler
 myHost = '127.0.0.1'
 myPort = 8080
 
-
 sockobj = socket(AF_INET, SOCK_STREAM)
 sockobj.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 sockobj.bind((myHost, myPort))
@@ -59,7 +58,7 @@ cores = 1
 document_root = os.getcwd()
 
 print('Default root (your project directory): ' + document_root + ' and port: ' + str(myPort))
-options, remainder = getopt.getopt(sys.argv[1:], "r:p:c:")
+options, remainder = getopt.getopt(sys.argv[1:], "r:c:")
 
 for opt, arg in options:
     if opt == '-r':
@@ -70,6 +69,5 @@ for opt, arg in options:
 document_root = is_it_correct_root(document_root)
 if document_root:
     dispatcher(document_root)
-    reapChildren()
 else:
     print("Incorrect root!")
