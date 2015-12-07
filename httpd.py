@@ -4,7 +4,7 @@ import getopt
 from socket import *
 from ClientHandler import Handler
 myHost = '127.0.0.1'
-myPort = 8080
+myPort = 8082
 
 sockobj = socket(AF_INET, SOCK_STREAM)
 sockobj.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
@@ -20,6 +20,14 @@ def is_it_correct_root(root):
     else:
         return root
 
+
+def is_it_correct_cores(cores):
+    if cores >= 1 and cores <= 10:
+        return cores
+    else:
+        return False
+
+
 def now():
     return time.ctime(time.time())
 
@@ -34,27 +42,30 @@ def reapChildren():
         activeChildren.remove(pid)
 
 
-def dispatcher(document_root):
-    while True:
-        try:
-            connection, addres = sockobj.accept()
-            print('Server connected by', addres, ' ')
-            print('at', now())
+def dispatcher(document_root, cores):
+    for i in range(cores):
+        childPid = os.fork()
 
-            reapChildren()
-            childPid = os.fork()
+        if childPid == 0:
+            while True:
+                try:
+                    connection, addres = sockobj.accept()
+                    # print('Server connected by', addres, ' ')
+                    # print('at', now())
+                    client_handler = Handler(connection, document_root)
+                    client_handler.handle_client()
+                except KeyboardInterrupt:
+                    os._exit(0)
+                except:
+                    pass
 
-            if childPid == 0:
-                client_handler = Handler(connection, document_root)
-                client_handler.handle_client()
-            else:
-                activeChildren.append(childPid)
-        except KeyboardInterrupt:
-            return
+    try:
+        os.waitpid(-1, 0)
+    except KeyboardInterrupt:
+        os._exit(0)
 
 
-
-cores = 1
+cores = 5
 document_root = os.getcwd()
 
 try:
@@ -66,12 +77,16 @@ else:
         if opt == '-r':
             document_root = arg
         elif opt == '-c':
-            cores = int(arg)
+            try:
+                cores = int(arg)
+            except:
+                cores = False
 
 print('Root (Default it is your project directory): ' + document_root)
 print('Host: localhost:' + str(myPort))
 document_root = is_it_correct_root(document_root)
-if document_root:
-    dispatcher(document_root)
+cores = is_it_correct_cores(cores)
+if document_root and cores:
+    dispatcher(document_root, cores)
 else:
-    print("Incorrect root!")
+    print("Incorrect root or cores!")

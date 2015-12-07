@@ -40,21 +40,19 @@ class Handler:
                 data += data_buffer.decode('utf-8')
 
             self.request_data = data
-            #print(data)
+            # print(data)
 
             response_data = self.create_response(self.request_data)
-            #print(response_data)
+            # print(response_data)
 
             if response_data:
                 self.connection.send(response_data)
-                try:
-                    self.connection.shutdown(socket.SHUT_RDWR)
-                except socket.error:
-                    self.connection.close()
-                else:
-                    self.connection.close()
-
-            os._exit(0)
+            try:
+                self.connection.shutdown(socket.SHUT_RDWR)
+            except socket.error:
+                self.connection.close()
+            else:
+                self.connection.close()
 
 
     def create_response_string(self):
